@@ -1,1 +1,66 @@
-console.log("Welcome to your CGPA & GPA Calculator!");
+const generateBtn = document.getElementById("generate");
+const calculateBtn = document.getElementById("calculate");
+const subjectsContainer = document.getElementById("subjects-container");
+const resultDiv = document.getElementById("result");
+const cgpaSection = document.getElementById("cgpa-section");
+
+generateBtn.addEventListener("click", () => {
+  const numSubjects = parseInt(document.getElementById("subjects").value);
+  subjectsContainer.innerHTML = "";
+
+  if (!numSubjects || numSubjects <= 0) {
+    alert("Please enter a valid number of subjects!");
+    return;
+  }
+
+  for (let i = 1; i <= numSubjects; i++) {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <h3>Subject ${i}</h3>
+      <input type="number" placeholder="Credit Hours" id="credit${i}" min="1" />
+      <input type="number" placeholder="Grade Point (e.g. 4.0)" step="0.01" id="grade${i}" />
+    `;
+    subjectsContainer.appendChild(div);
+  }
+
+  cgpaSection.classList.remove("hidden");
+  calculateBtn.classList.remove("hidden");
+});
+
+calculateBtn.addEventListener("click", () => {
+  let totalCredits = 0;
+  let totalGradePoints = 0;
+  const numSubjects = parseInt(document.getElementById("subjects").value);
+
+  for (let i = 1; i <= numSubjects; i++) {
+    const credit = parseFloat(document.getElementById(`credit${i}`).value);
+    const grade = parseFloat(document.getElementById(`grade${i}`).value);
+
+    if (!credit || !grade) {
+      alert(`Please fill all fields for Subject ${i}`);
+      return;
+    }
+
+    totalCredits += credit;
+    totalGradePoints += credit * grade;
+  }
+
+  const GPA = totalGradePoints / totalCredits;
+  const prevCredits = parseFloat(document.getElementById("prev-credits").value) || 0;
+  const prevCGPA = parseFloat(document.getElementById("prev-cgpa").value) || 0;
+
+  const CGPA = (prevCGPA * prevCredits + GPA * totalCredits) / (prevCredits + totalCredits || 1);
+
+  let message = "";
+  if (GPA >= 3.7) message = "🔥 Outstanding! You’re on fire!";
+  else if (GPA >= 3.0) message = "💪 Great job! Keep pushing forward!";
+  else if (GPA >= 2.0) message = "📈 You’re doing fine. A bit more effort and you’ll shine!";
+  else message = "🌱 Don’t give up. Every semester is a new chance to rise!";
+
+  resultDiv.innerHTML = `
+    <h2>🎯 GPA: ${GPA.toFixed(2)}</h2>
+    <h2>🏆 CGPA: ${CGPA.toFixed(2)}</h2>
+    <p>${message}</p>
+  `;
+  resultDiv.classList.remove("hidden");
+});
